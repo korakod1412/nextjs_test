@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, message } from 'antd/lib';
 import { api } from '~/utils/api';
+import TestForm from './testfromhook'
 
 interface UserProps {
     id: number;
@@ -14,9 +15,21 @@ interface UserProps {
 function SelectForm() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [users, setUsers] = useState<UserProps[]>([]);
-    const { data: select } = api.crud.select.useQuery({
+    const { data: select, refetch } = api.post.select.useQuery({
         name: 'samphao@gmail.com',
     });
+    const deleteTaskMutation = api.post.delete.useMutation({
+        onSuccess: () => {
+            message.success('User deleted successfully');
+            // refetch();
+
+        },
+        onError: () => {
+            message.error('Failed to delete user');
+        }
+    });
+    const utils = api.useContext();
+    const list = utils.post.select;
 
     useEffect(() => {
         if (select) {
@@ -36,14 +49,21 @@ function SelectForm() {
         setIsModalOpen(false);
     };
 
-    const editBtn = (record: UserProps) => {
+    const editBtn = async (record: UserProps) => {
         console.log('Edit button clicked', record);
+        const setUsers2 = await list.getData();
+        alert(JSON.stringify(setUsers2));
     };
 
+
+
     const deleteUser = (id: number) => {
-        const newUsers = users.filter((user) => user.id !== id);
-        setUsers(newUsers);
-        message.success('User deleted successfully');
+        deleteTaskMutation.mutate({ id: id }, {
+            onSuccess: async (del) => {
+                list.invalidate();
+
+            }
+        });
 
     };
 
@@ -103,6 +123,7 @@ function SelectForm() {
 
     return (
         <div>
+
             <div className="flex justify-end mt-5 mr-5">
                 <Button type="primary" onClick={showModal}>
                     Open Modal
@@ -110,9 +131,7 @@ function SelectForm() {
             </div>
             <Table dataSource={users} columns={columns} rowKey="id" />
             <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
+                <TestForm />
             </Modal>
         </div>
     );

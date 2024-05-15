@@ -9,15 +9,15 @@ import {
 export const postRouter = createTRPCRouter({
   hello: publicProcedure
     .input(z.object({ text: z.string() })) //รับinputอะไรมา
-    .query(({ input }) => { 
+    .query(({ input }) => {
       return {
         greeting: `Hello ${input.text}`,
       };
     }),
 
-    helloarray: publicProcedure
+  helloarray: publicProcedure
     .input(z.object({ text: z.string() })) //รับinputอะไรมา
-    .query(({ input }) => { 
+    .query(({ input }) => {
       return [
         {
           greeting: `Hello ${input.text}`,
@@ -28,11 +28,10 @@ export const postRouter = createTRPCRouter({
         {
           greeting: `Hello ${input.text}`,
         },
-      ]
-      
+      ];
     }),
 
-    create: protectedProcedure
+  create: protectedProcedure
     .input(z.object({ name: z.string(), email: z.string() }))
     .mutation(async ({ ctx, input }) => {
       // simulate a slow db call
@@ -41,20 +40,20 @@ export const postRouter = createTRPCRouter({
       return ctx.db.hello.create({
         data: {
           name: input.name,
-          email:input.email,
+          email: input.email,
           createdAt: newDate,
           createdBy: "Korakod",
         },
       });
     }),
 
-    update: protectedProcedure
+  update: protectedProcedure
     .input(z.object({ nameEdit: z.string() }))
     .mutation(async ({ ctx, input }) => {
       // simulate a slow db call
       //await new Promise((resolve) => setTimeout(resolve, 1000));
       let newDate = new Date();
-      return ctx.db.hello.updateMany({
+      return ctx.db.user.updateMany({
         where: {
           name: input.nameEdit,
         },
@@ -64,26 +63,24 @@ export const postRouter = createTRPCRouter({
       });
     }),
 
-    delete: protectedProcedure
+  delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
       // simulate a slow db call
       await new Promise((resolve) => setTimeout(resolve, 1000));
       let newDate = new Date();
-      return ctx.db.hello.delete({
+      return ctx.db.user.delete({
         where: {
           id: input.id,
         },
       });
     }),
 
-    select: protectedProcedure
+  select: protectedProcedure
     .input(z.object({ name: z.string() }))
     .query(async ({ ctx, input }) => {
-      const user = await ctx.db.hello.findMany({});
+      const user = await ctx.db.user.findMany({});
       //  console.log(JSON.stringify(user));
       return user;
     }),
- 
 });
-

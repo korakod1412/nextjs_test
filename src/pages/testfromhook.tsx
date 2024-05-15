@@ -16,7 +16,7 @@ import Swal from 'sweetalert2'
   formSchema,
   titleOptions,
 } from "~/components/form/schemaTest";*/}
-function testForm() {
+function TestForm() {
   const { mutate } = api.crud.create.useMutation();
   const {
     register, control,
@@ -174,4 +174,4 @@ function testForm() {
   );
 }
 
-export default testForm;
+export default TestForm;
