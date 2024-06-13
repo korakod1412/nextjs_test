@@ -16,22 +16,34 @@ datasource db {
 
 model Hello {
     id        Int      @id @default(autoincrement())
-    name      String
+    name      String?
+    username      String?
+    password      String?
     email     String?  @unique
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    createdBy String
+    createdBy String?
 }
+
 
 model user {
     id        Int      @id @default(autoincrement())
-    name      String
-    surname     String
+    username      String?
+    password      String
+    name      String?
+    surname     String?
     address    String
-    email      String
-    phone     String  
+    email      String  @unique
+    phone     String
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime? @updatedAt
     createdBy String
+      role    Role     @default(USER)
+    refreshToken    String?    @unique
+    refreshTokenExpires Int?
 }
 
+enum Role {
+  USER
+  ADMIN
+}

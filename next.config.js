@@ -10,7 +10,7 @@ const config = {
   transpilePackages: ["antd", "rc-util", "@ant-design/icons"],
 
   /**
-   * If you are using `appDir` then you must comment the below `i18n` config out.
+   * If you are using `appDir` then yoiu must comment the below `i18n` config out.
    *
    * @see https://github.com/vercel/next.js/issues/41980
    */

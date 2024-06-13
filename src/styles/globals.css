@@ -1,11 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.error-message {
-    color: red;
-  }
-
-  .ant-btn-primary {
-    background-color: blue;
-  }
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import "../features/ui/components/Button.css";

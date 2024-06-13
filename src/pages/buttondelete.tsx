@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, message } from 'antd/lib';
 import { api } from '~/utils/api';
 import TestForm from './testfromhook'
-import Buttondelete from './buttondelete';
 
 interface UserProps {
     id: number;
@@ -13,7 +12,7 @@ interface UserProps {
     surname: string;
 }
 
-function SelectForm() {
+function Buttondelete() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [users, setUsers] = useState<UserProps[]>([]);
     const { data: select, refetch } = api.post.select.useQuery({
@@ -79,51 +78,21 @@ function SelectForm() {
         });
     };
 
-    const columns = [
-        {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-        },
-        {
-            title: 'Surname',
-            dataIndex: 'surname',
-        },
-        {
-            title: 'Address',
-            dataIndex: 'address',
-        },
-        {
-            title: 'Email',
-            dataIndex: 'email',
-        },
-        {
-            title: 'Phone',
-            dataIndex: 'phone',
-        },
-        {
-            title: 'Tool',
-            dataIndex: 'id',
-            render: (text: any, record: UserProps) => (
-                <>
-                    <Button type="primary" onClick={() => editBtn(record)}>
-                        Edit
-                    </Button>
-                    &nbsp;
-                </>
-            ),
-        },
-    ];
 
     return (
         <div>
 
             <div className="flex justify-end mt-5 mr-5">
             </div>
-            <Table dataSource={users} columns={columns} rowKey="id" />
-
+            <Button
+                type="primary"
+                danger
+                onClick={() => delBtn(record)}
+            >
+                Delete
+            </Button>
         </div>
     );
 }
 
-export default SelectForm;
+export default Buttondelete;

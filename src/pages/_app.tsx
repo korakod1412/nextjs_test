@@ -1,26 +1,30 @@
+import { type AppProps } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import { type AppType } from "next/app";
-import { Inter } from "next/font/google";
-
+import { type NextPage } from "next";
+import { type ReactElement, type ReactNode } from "react";
 import { api } from "~/utils/api";
-
 import "~/styles/globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
+  getLayout?: (props: { children: ReactNode }) => ReactElement;
+};
 
-const MyApp: AppType<{ session: Session | null }> = ({
+interface AppPropsWithLayout extends AppProps<{ session: Session | null }> {
+  Component: NextPageWithLayout;
+}
+
+const MyApp = ({
   Component,
   pageProps: { session, ...pageProps },
-}) => {
+}: AppPropsWithLayout) => {
+  const Layout = Component.getLayout ?? (({ children }) => <>{children}</>);
+
   return (
     <SessionProvider session={session}>
-      <main className={`font-sans ${inter.variable}`}>
+      <Layout>
         <Component {...pageProps} />
-      </main>
+      </Layout>
     </SessionProvider>
   );
 };

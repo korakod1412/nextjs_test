@@ -1,20 +1,46 @@
 import { z } from "zod";
-
+import bcrypt from "bcryptjs";
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import * as validators from "~/components/validation";
-
+import * as validators from "~/features/manageUser/validation";
+import { generateRefreshToken } from "~/features/auth/helpers/token";
 export const crudRouter = createTRPCRouter({
-  create: protectedProcedure
+  create: publicProcedure
     .input(validators.formSchema)
     .mutation(async ({ ctx, input }) => {
       // simulate a slow db call
       //await new Promise((resolve) => setTimeout(resolve, 1000));
       let newDate = new Date();
+      const hashedPassword = await bcrypt.hash("P@ssw0rd", 12);
       return ctx.db.user.create({
+        data: {
+          name: input.input_str,
+          username: "samphao",
+          email: input.email_str,
+          address: input.address_str,
+          surname: input.surname_str,
+          phone: input.phone_str,
+          createdAt: newDate,
+          createdBy: "Korakod",
+
+          ...generateRefreshToken(),
+          password: hashedPassword,
+        },
+      });
+    }),
+
+  update: publicProcedure
+    .input(validators.formSchema)
+    .mutation(async ({ ctx, input }) => {
+      let newDate = new Date();
+      return ctx.db.user.update({
+        where: {
+          id: input.idUser,
+        },
+
         data: {
           name: input.input_str,
           email: input.email_str,
@@ -27,23 +53,7 @@ export const crudRouter = createTRPCRouter({
       });
     }),
 
-  update: protectedProcedure
-    .input(z.object({ nameEdit: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      // simulate a slow db call
-      //await new Promise((resolve) => setTimeout(resolve, 1000));
-      let newDate = new Date();
-      return ctx.db.user.updateMany({
-        where: {
-          name: input.nameEdit,
-        },
-        data: {
-          name: "Viola the Magnificent",
-        },
-      });
-    }),
-
-  delete: protectedProcedure
+  delete: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
       // simulate a slow db call
@@ -56,11 +66,24 @@ export const crudRouter = createTRPCRouter({
       });
     }),
 
-  select: protectedProcedure
+  select: publicProcedure
     .input(z.object({ name: z.string() }))
     .query(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findMany({});
-      //  console.log(JSON.stringify(user));
+      const user = await ctx.db.user.findMany({
+        orderBy: {
+          id: "desc",
+        },
+      });
+
       return user;
     }),
+  selectUniq: protectedProcedure.query(async ({ ctx, input }) => {
+    const user = await ctx.db.user.findFirst({
+      orderBy: {
+        id: "desc",
+      },
+    });
+    console.log("all=" + JSON.stringify(user));
+    return user;
+  }),
 });

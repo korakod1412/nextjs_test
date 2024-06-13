@@ -1,4 +1,3 @@
-import { FormEvent } from "react";
 import { api } from "~/utils/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "antd/lib";
@@ -8,90 +7,68 @@ import {
   formSchema,
   type FormSchemaInputType,
   type FormSchemaOutputType,
-} from "~/components/validation";
-import Swal from 'sweetalert2'
+} from "~/features/manageUser/validation";
+import Swal from "sweetalert2";
+import React, { useState, Dispatch, SetStateAction } from "react";
+import { boolean } from "zod";
+import { type userProps } from "~/features/manageUser/types";
+import { user as UserModel } from "@prisma/client";
+interface modalProps {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  surname: string;
+}
+interface Props {
+  value: UserModel[];
+  setValue: Dispatch<SetStateAction<UserModel[]>>;
+  valueModal: boolean;
+  setModal: Dispatch<SetStateAction<boolean>>;
+}
 
-{/*import {
-  FormSchemaInputType,
-  formSchema,
-  titleOptions,
-} from "~/components/form/schemaTest";*/}
-function TestForm() {
+export function testForm(props: Props) {
+  const utils = api.useContext();
+  const list = utils.crud.select;
   const { mutate } = api.crud.create.useMutation();
+  const defaultValues = {
+    idUser: 1,
+    /** rest */
+  };
   const {
-    register, control,
+    register,
+    control,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm<FormSchemaInputType>({
     resolver: zodResolver(formSchema, {}, { raw: true }),
+    defaultValues,
   });
-  //const insert = api.post.create.useMutation();
 
   const onSubmit: SubmitHandler<FormSchemaOutputType> = async (data) => {
     mutate(data, {
       //this is working - title is going to database if its not already there
       onSuccess: () => {
         Swal.fire({
-          title: "The Internet?",
-          text: "That thing is still around?",
-          icon: "question"
+          title: "Insert User ",
+          text: "Completed successfully",
+          icon: "success",
         });
+        control._reset();
+        props.setModal(false);
+        list.invalidate();
       }, //try#2);
     });
   };
 
-
-  /*const onSubmit: SubmitHandler<FormData> = async (data) => {
-    try {
-      const response = await fetch('/api/submit-form', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to submit form');
-      }
-  
-      alert('Form submitted successfully!');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Failed to submit form');
-    }
-  };*/
-
-
-  /*async function onSubmitx(event: FormData) {
-    console.log(event);
-    //  event.preventDefault();
-    const { input_str } = event;
-    alert(JSON.stringify(input_str));
-  }*/
-  /*async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const target = event.target as typeof event.target & {
-      input_str: { value: string };
-      surname_str: { value: string };
-      address_str: { value: string };
-      phone_str: { value: string };
-      email_str: { value: string };
-      //password: { value: string };
-    };
-    const input_str = target.input_str.value;
-    alert(input_str);
-  }*/
-
-
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="m-10 grid  rounded bg-amber-200 pt-10">
-          <div className=" flex flex-row justify-center gap-2   text-left">
-            <div className="w-2/12 flex-initial">
+        <div className="m-2 grid  rounded bg-amber-200 pt-4">
+          <div className=" flex flex-col justify-center gap-2   p-4 text-left">
+            <div>
               <Input
                 label="Name"
                 name="input_str"
@@ -104,7 +81,7 @@ function TestForm() {
                 <p className="error-message">{errors.input_str.message}</p>
               )}
             </div>
-            <div className="w-2/12">
+            <div>
               <Input
                 label="surName"
                 name="surname_str"
@@ -117,10 +94,7 @@ function TestForm() {
                 <p className="error-message">{errors.surname_str.message}</p>
               )}
             </div>
-          </div>
-
-          <div className=" flex flex-row  justify-center gap-2  text-left align-middle">
-            <div className="w-4/12 flex-none">
+            <div>
               <Input
                 label="Address"
                 name="address_str"
@@ -133,9 +107,7 @@ function TestForm() {
                 <p className="error-message">{errors.address_str.message}</p>
               )}
             </div>
-          </div>
-          <div className=" flex flex-row justify-center gap-2   text-left">
-            <div className="w-2/12 flex-initial">
+            <div>
               <Input
                 defaultValue="222-222-2222"
                 label="Phone"
@@ -149,7 +121,7 @@ function TestForm() {
                 <p className="error-message">{errors.phone_str.message}</p>
               )}
             </div>
-            <div className="w-2/12">
+            <div>
               <Input
                 label="Email"
                 name="email_str"
@@ -174,4 +146,4 @@ function TestForm() {
   );
 }
 
-export default TestForm;
+export default testForm;
